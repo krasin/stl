@@ -139,7 +139,7 @@ func (p *Stl) Init() {
 	}
 	classes := [...][32]uint8{
 		[32]uint8{0, 0, 0, 0, 0, 248, 255, 255, 63, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		[32]uint8{0, 0, 0, 0, 0, 0, 0, 0, 254, 255, 255, 7, 254, 255, 255, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[32]uint8{0, 0, 0, 0, 0, 0, 255, 3, 254, 255, 255, 135, 254, 255, 255, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	}
 	matchClass := func(class uint) bool {
 		if (position < len(p.Buffer)) &&
@@ -155,175 +155,30 @@ func (p *Stl) Init() {
 		/* 0 e <- (Header Facet* EndSolid !. commit) */
 		func() bool {
 			position0, thunkPosition0 := position, thunkPosition
-			if !matchString("solid") {
+			if !p.rules[1]() {
 				goto l0
-			}
-			if !p.rules[14]() {
-				goto l0
-			}
-			{
-				position1, thunkPosition1 := position, thunkPosition
-				if !p.rules[12]() {
-					goto l2
-				}
-				do(0)
-				goto l1
-			l2:
-				position, thunkPosition = position1, thunkPosition1
 			}
 		l1:
-			if !p.rules[10]() {
-				goto l0
-			}
-		l3:
 			{
-				position4, thunkPosition4 := position, thunkPosition
-				{
-					position5, thunkPosition5 := position, thunkPosition
-					if !p.rules[14]() {
-						goto l5
-					}
-					goto l6
-				l5:
-					position, thunkPosition = position5, thunkPosition5
+				position2, thunkPosition2 := position, thunkPosition
+				if !p.rules[2]() {
+					goto l2
 				}
-			l6:
-				if !matchString("facet") {
-					goto l4
-				}
-				if !p.rules[14]() {
-					goto l4
-				}
-				do(1)
-				if !matchString("normal") {
-					goto l4
-				}
-				if !p.rules[14]() {
-					goto l4
-				}
-				if !p.rules[11]() {
-					goto l4
-				}
-				if !p.rules[14]() {
-					goto l4
-				}
-				if !p.rules[11]() {
-					goto l4
-				}
-				if !p.rules[14]() {
-					goto l4
-				}
-				if !p.rules[11]() {
-					goto l4
-				}
-				if !p.rules[10]() {
-					goto l4
-				}
-				{
-					position7, thunkPosition7 := position, thunkPosition
-					if !p.rules[14]() {
-						goto l7
-					}
-					goto l8
-				l7:
-					position, thunkPosition = position7, thunkPosition7
-				}
-			l8:
-				if !matchString("outer") {
-					goto l4
-				}
-				if !p.rules[14]() {
-					goto l4
-				}
-				if !matchString("loop") {
-					goto l4
-				}
-				if !p.rules[10]() {
-					goto l4
-				}
-				if !p.rules[6]() {
-					goto l4
-				}
-				if !p.rules[6]() {
-					goto l4
-				}
-				if !p.rules[6]() {
-					goto l4
-				}
-				{
-					position9, thunkPosition9 := position, thunkPosition
-					if !p.rules[14]() {
-						goto l9
-					}
-					goto l10
-				l9:
-					position, thunkPosition = position9, thunkPosition9
-				}
-			l10:
-				if !matchString("endloop") {
-					goto l4
-				}
-				if !p.rules[10]() {
-					goto l4
-				}
-				{
-					position11, thunkPosition11 := position, thunkPosition
-					if !p.rules[14]() {
-						goto l11
-					}
-					goto l12
-				l11:
-					position, thunkPosition = position11, thunkPosition11
-				}
-			l12:
-				if !matchString("endfacet") {
-					goto l4
-				}
-				if !p.rules[10]() {
-					goto l4
-				}
-				goto l3
-			l4:
-				position, thunkPosition = position4, thunkPosition4
+				goto l1
+			l2:
+				position, thunkPosition = position2, thunkPosition2
 			}
-			{
-				position13, thunkPosition13 := position, thunkPosition
-				if !p.rules[14]() {
-					goto l13
-				}
-				goto l14
-			l13:
-				position, thunkPosition = position13, thunkPosition13
-			}
-		l14:
-			if !matchString("endsolid") {
-				goto l0
-			}
-			if !p.rules[14]() {
+			if !p.rules[9]() {
 				goto l0
 			}
 			{
-				position15, thunkPosition15 := position, thunkPosition
-				if !p.rules[12]() {
-					goto l16
-				}
-				do(3)
-				goto l15
-			l16:
-				position, thunkPosition = position15, thunkPosition15
-			}
-		l15:
-			if !p.rules[10]() {
-				goto l0
-			}
-			{
-				position17, thunkPosition17 := position, thunkPosition
+				position3, thunkPosition3 := position, thunkPosition
 				if !matchDot() {
-					goto l17
+					goto l3
 				}
 				goto l0
-			l17:
-				position, thunkPosition = position17, thunkPosition17
+			l3:
+				position, thunkPosition = position3, thunkPosition3
 			}
 			if !(commit(thunkPosition0)) {
 				goto l0
@@ -334,64 +189,281 @@ func (p *Stl) Init() {
 			return false
 		},
 		/* 1 Header <- ('solid' Space ((Identifier { p.Name = buffer[begin:end] }) /) NewLine) */
-		nil,
+		func() bool {
+			position0, thunkPosition0 := position, thunkPosition
+			if !matchString("solid") {
+				goto l4
+			}
+			if !p.rules[14]() {
+				goto l4
+			}
+			{
+				position5, thunkPosition5 := position, thunkPosition
+				if !p.rules[12]() {
+					goto l6
+				}
+				do(0)
+				goto l5
+			l6:
+				position, thunkPosition = position5, thunkPosition5
+			}
+		l5:
+			if !p.rules[10]() {
+				goto l4
+			}
+			return true
+		l4:
+			position, thunkPosition = position0, thunkPosition0
+			return false
+		},
 		/* 2 Facet <- (FacetHeader OuterLoop Vertex Vertex Vertex EndLoop EndFacet) */
-		nil,
+		func() bool {
+			position0, thunkPosition0 := position, thunkPosition
+			if !p.rules[3]() {
+				goto l7
+			}
+			if !p.rules[5]() {
+				goto l7
+			}
+			if !p.rules[6]() {
+				goto l7
+			}
+			if !p.rules[6]() {
+				goto l7
+			}
+			if !p.rules[6]() {
+				goto l7
+			}
+			if !p.rules[7]() {
+				goto l7
+			}
+			if !p.rules[8]() {
+				goto l7
+			}
+			return true
+		l7:
+			position, thunkPosition = position0, thunkPosition0
+			return false
+		},
 		/* 3 FacetHeader <- (Space? 'facet' Space { p.Add() } 'normal' Space Vector NewLine) */
-		nil,
+		func() bool {
+			position0, thunkPosition0 := position, thunkPosition
+			{
+				position9, thunkPosition9 := position, thunkPosition
+				if !p.rules[14]() {
+					goto l9
+				}
+				goto l10
+			l9:
+				position, thunkPosition = position9, thunkPosition9
+			}
+		l10:
+			if !matchString("facet") {
+				goto l8
+			}
+			if !p.rules[14]() {
+				goto l8
+			}
+			do(1)
+			if !matchString("normal") {
+				goto l8
+			}
+			if !p.rules[14]() {
+				goto l8
+			}
+			if !p.rules[4]() {
+				goto l8
+			}
+			if !p.rules[10]() {
+				goto l8
+			}
+			return true
+		l8:
+			position, thunkPosition = position0, thunkPosition0
+			return false
+		},
 		/* 4 Vector <- (Number Space Number Space Number) */
-		nil,
+		func() bool {
+			position0, thunkPosition0 := position, thunkPosition
+			if !p.rules[11]() {
+				goto l11
+			}
+			if !p.rules[14]() {
+				goto l11
+			}
+			if !p.rules[11]() {
+				goto l11
+			}
+			if !p.rules[14]() {
+				goto l11
+			}
+			if !p.rules[11]() {
+				goto l11
+			}
+			return true
+		l11:
+			position, thunkPosition = position0, thunkPosition0
+			return false
+		},
 		/* 5 OuterLoop <- (Space? 'outer' Space 'loop' NewLine) */
-		nil,
+		func() bool {
+			position0, thunkPosition0 := position, thunkPosition
+			{
+				position13, thunkPosition13 := position, thunkPosition
+				if !p.rules[14]() {
+					goto l13
+				}
+				goto l14
+			l13:
+				position, thunkPosition = position13, thunkPosition13
+			}
+		l14:
+			if !matchString("outer") {
+				goto l12
+			}
+			if !p.rules[14]() {
+				goto l12
+			}
+			if !matchString("loop") {
+				goto l12
+			}
+			if !p.rules[10]() {
+				goto l12
+			}
+			return true
+		l12:
+			position, thunkPosition = position0, thunkPosition0
+			return false
+		},
 		/* 6 Vertex <- (Space? 'vertex' { p.Vertex() } Space Number Space Number Space Number NewLine) */
 		func() bool {
 			position0, thunkPosition0 := position, thunkPosition
 			{
-				position24, thunkPosition24 := position, thunkPosition
+				position16, thunkPosition16 := position, thunkPosition
 				if !p.rules[14]() {
-					goto l24
+					goto l16
 				}
-				goto l25
-			l24:
-				position, thunkPosition = position24, thunkPosition24
+				goto l17
+			l16:
+				position, thunkPosition = position16, thunkPosition16
 			}
-		l25:
+		l17:
 			if !matchString("vertex") {
-				goto l23
+				goto l15
 			}
 			do(2)
 			if !p.rules[14]() {
-				goto l23
+				goto l15
 			}
 			if !p.rules[11]() {
-				goto l23
+				goto l15
 			}
 			if !p.rules[14]() {
-				goto l23
+				goto l15
 			}
 			if !p.rules[11]() {
-				goto l23
+				goto l15
 			}
 			if !p.rules[14]() {
-				goto l23
+				goto l15
 			}
 			if !p.rules[11]() {
-				goto l23
+				goto l15
 			}
 			if !p.rules[10]() {
-				goto l23
+				goto l15
 			}
 			return true
-		l23:
+		l15:
 			position, thunkPosition = position0, thunkPosition0
 			return false
 		},
 		/* 7 EndLoop <- (Space? 'endloop' NewLine) */
-		nil,
+		func() bool {
+			position0, thunkPosition0 := position, thunkPosition
+			{
+				position19, thunkPosition19 := position, thunkPosition
+				if !p.rules[14]() {
+					goto l19
+				}
+				goto l20
+			l19:
+				position, thunkPosition = position19, thunkPosition19
+			}
+		l20:
+			if !matchString("endloop") {
+				goto l18
+			}
+			if !p.rules[10]() {
+				goto l18
+			}
+			return true
+		l18:
+			position, thunkPosition = position0, thunkPosition0
+			return false
+		},
 		/* 8 EndFacet <- (Space? 'endfacet' NewLine) */
-		nil,
+		func() bool {
+			position0, thunkPosition0 := position, thunkPosition
+			{
+				position22, thunkPosition22 := position, thunkPosition
+				if !p.rules[14]() {
+					goto l22
+				}
+				goto l23
+			l22:
+				position, thunkPosition = position22, thunkPosition22
+			}
+		l23:
+			if !matchString("endfacet") {
+				goto l21
+			}
+			if !p.rules[10]() {
+				goto l21
+			}
+			return true
+		l21:
+			position, thunkPosition = position0, thunkPosition0
+			return false
+		},
 		/* 9 EndSolid <- (Space? 'endsolid' Space ((Identifier { p.EndName = buffer[begin:end] }) /) NewLine) */
-		nil,
+		func() bool {
+			position0, thunkPosition0 := position, thunkPosition
+			{
+				position25, thunkPosition25 := position, thunkPosition
+				if !p.rules[14]() {
+					goto l25
+				}
+				goto l26
+			l25:
+				position, thunkPosition = position25, thunkPosition25
+			}
+		l26:
+			if !matchString("endsolid") {
+				goto l24
+			}
+			if !p.rules[14]() {
+				goto l24
+			}
+			{
+				position27, thunkPosition27 := position, thunkPosition
+				if !p.rules[12]() {
+					goto l28
+				}
+				do(3)
+				goto l27
+			l28:
+				position, thunkPosition = position27, thunkPosition27
+			}
+		l27:
+			if !p.rules[10]() {
+				goto l24
+			}
+			return true
+		l24:
+			position, thunkPosition = position0, thunkPosition0
+			return false
+		},
 		/* 10 NewLine <- (space* ('\n' / '\r' / '\r\n')) */
 		func() bool {
 			position0, thunkPosition0 := position, thunkPosition
@@ -453,7 +525,7 @@ func (p *Stl) Init() {
 			position, thunkPosition = position0, thunkPosition0
 			return false
 		},
-		/* 12 Identifier <- (< [a-zA-Z]+ >) */
+		/* 12 Identifier <- (< [a-zA-Z_0-9]+ >) */
 		func() bool {
 			position0, thunkPosition0 := position, thunkPosition
 			begin = position

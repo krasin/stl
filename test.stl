@@ -1,4 +1,4 @@
-solid object
+solid object_3
 facet normal 0 0 0
   outer loop
     vertex 1.040226e+01 -1.008939e+01 0.000000e+00
@@ -2211,4 +2211,4 @@ facet normal 0 0 0
     vertex 1.030267e+01 -9.919353e+00 1.956290e+00
   endloop
 endfacet
-endsolid object
+endsolid object_3

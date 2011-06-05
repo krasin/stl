@@ -27,7 +27,7 @@ EndSolid <- Space? 'endsolid' Space ( Identifier { p.EndName = buffer[begin:end]
 
 NewLine <- space* ( '\n' / '\r' / '\r\n' )
 Number <- < [0-9.+-Ee]+ > { p.Num(buffer[begin:end]) }
-Identifier <- < [a-zA-Z]+ >
+Identifier <- < [a-zA-Z_0-9]+ >
 space <- ' '
 Space <- space+
 
