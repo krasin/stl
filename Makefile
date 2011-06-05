@@ -10,10 +10,4 @@ GOFILES=\
 	stl.go\
 	stl.peg.go\
 
-PREREQ+=stl.peg.go
-CLEANFILES+=stl.peg.go
-
 include $(GOROOT)/src/Make.pkg
-
-stl.peg.go: stl.peg
-	../../cmd/peg/peg -inline=true -switch=true stl.peg
