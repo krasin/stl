@@ -16,8 +16,8 @@ const SizeOfSTLTriangle = 4*3*4 + 2
 type STLPoint [3]float32
 
 type STLTriangle struct {
-	n STLPoint
-	v [3]STLPoint
+	N STLPoint
+	V [3]STLPoint
 }
 
 func readSTLPoint(a []byte, p *STLPoint) []byte {
@@ -80,7 +80,7 @@ func readAsciiSTL(data []byte) (res []STLTriangle, err error) {
 			if v, err = strconv.ParseFloat(fields[i], 32); err != nil {
 				return nil, err
 			}
-			t.n[i] = float32(v)
+			t.N[i] = float32(v)
 		}
 		if err = consumeLine(r, "outer loop"); err != nil {
 			return nil, err
@@ -98,7 +98,7 @@ func readAsciiSTL(data []byte) (res []STLTriangle, err error) {
 				if v, err = strconv.ParseFloat(fields[j], 32); err != nil {
 					return nil, err
 				}
-				t.v[i][j] = float32(v)
+				t.V[i][j] = float32(v)
 			}
 		}
 		if err = consumeLine(r, "endloop"); err != nil {
@@ -136,9 +136,9 @@ func ReadSTL(r io.Reader) (t []STLTriangle, err error) {
 	}
 	for i := 0; i < int(n); i++ {
 		var cur STLTriangle
-		data = readSTLPoint(data, &cur.n)
+		data = readSTLPoint(data, &cur.N)
 		for j := 0; j < 3; j++ {
-			data = readSTLPoint(data, &cur.v[j])
+			data = readSTLPoint(data, &cur.V[j])
 		}
 		data = data[2:]
 		t = append(t, cur)
