@@ -56,24 +56,28 @@ func consumeLine(r *bufio.Reader, want string) (err error) {
 
 func readAsciiSTL(data []byte) (res []STLTriangle, err error) {
 	r := bufio.NewReader(bytes.NewBuffer(data))
-	if err = consumeLine(r, "solid object"); err != nil {
-		return
+	var solidName string
+	if _, solidName, err = readLineWithPrefix(r, "solid "); err != nil {
+		return nil, err
 	}
+	lineno := 2
 	for {
 		var prefix, str string
 		var t STLTriangle
-		if prefix, str, err = readLineWithPrefix(r, "facet normal ", "endsolid object"); err != nil {
+		if prefix, str, err = readLineWithPrefix(r, "facet normal ", "endsolid "+solidName); err != nil {
 			if err == io.EOF {
 				return res, nil
 			}
 			return nil, err
 		}
-		if prefix == "endsolid object" {
+		lineno++
+
+		if prefix == "endsolid "+solidName {
 			return
 		}
 		fields := strings.Fields(str)
 		if len(fields) != 3 {
-			return nil, fmt.Errorf("Normal definition is broken: '%s'", str)
+			return nil, fmt.Errorf("[line=%d] Normal definition is broken: '%s'", lineno, str)
 		}
 		for i := 0; i < 3; i++ {
 			var v float64
@@ -85,13 +89,16 @@ func readAsciiSTL(data []byte) (res []STLTriangle, err error) {
 		if err = consumeLine(r, "outer loop"); err != nil {
 			return nil, err
 		}
+		lineno++
 		for i := 0; i < 3; i++ {
 			if _, str, err = readLineWithPrefix(r, "vertex "); err != nil {
 				return nil, err
 			}
+			lineno++
+
 			fields = strings.Fields(str)
 			if len(fields) != 3 {
-				return nil, fmt.Errorf("Vertex definition is broken: '%s'", str)
+				return nil, fmt.Errorf("[line=%d] Vertex definition is broken: '%s'", lineno, str)
 			}
 			for j := 0; j < 3; j++ {
 				var v float64
@@ -104,9 +111,12 @@ func readAsciiSTL(data []byte) (res []STLTriangle, err error) {
 		if err = consumeLine(r, "endloop"); err != nil {
 			return nil, err
 		}
+		lineno++
+
 		if err = consumeLine(r, "endfacet"); err != nil {
 			return nil, err
 		}
+		lineno++
 
 		res = append(res, t)
 

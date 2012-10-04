@@ -16,6 +16,7 @@ type readSTLTest struct {
 
 var readSTLTests = []readSTLTest{
 	{"data/cylinder.bin.stl", 326, nil},
+	{"data/plus_on_pedestal.stl", 1180, nil},
 	{
 		"data/cylinder.stl",
 		326,
@@ -49,10 +50,10 @@ func STLPointEqual(p1, p2 [3]float32) bool {
 }
 
 func STLEqual(t1, t2 STLTriangle) bool {
-	return STLPointEqual(t1.n, t2.n) &&
-		STLPointEqual(t1.v[0], t2.v[0]) &&
-		STLPointEqual(t1.v[1], t2.v[1]) &&
-		STLPointEqual(t1.v[2], t2.v[2])
+	return STLPointEqual(t1.N, t2.N) &&
+		STLPointEqual(t1.V[0], t2.V[0]) &&
+		STLPointEqual(t1.V[1], t2.V[1]) &&
+		STLPointEqual(t1.V[2], t2.V[2])
 }
 
 func TestReadSTL(t *testing.T) {
