@@ -5,6 +5,7 @@ import (
 	"io"
 )
 
+// Write writes the triangle mesh to the writer using ASCII STL codec.
 func Write(w io.Writer, t []Triangle) error {
 	var err error
 

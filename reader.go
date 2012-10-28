@@ -117,6 +117,7 @@ func readAscii(data []byte) (res []Triangle, err error) {
 	return
 }
 
+// Read reads STL file from the reader.
 func Read(r io.Reader) (t []Triangle, err error) {
 	var data []byte
 	if data, err = ioutil.ReadAll(r); err != nil {
