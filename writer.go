@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-func Write(w io.Writer, t []STLTriangle) error {
+func Write(w io.Writer, t []Triangle) error {
 	var err error
 
 	printf := func(format string, a ...interface{}) {

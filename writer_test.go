@@ -7,16 +7,16 @@ import (
 )
 
 type writerTest struct {
-	t     []STLTriangle
+	t     []Triangle
 	model string
 }
 
 var writerTests = []writerTest{
 	{
-		t: []STLTriangle{
+		t: []Triangle{
 			{
-				N: STLPoint{0, 0, 1},
-				V: [3]STLPoint{
+				N: Point{0, 0, 1},
+				V: [3]Point{
 					{0, 0, 0},
 					{1, 0, 0},
 					{0, 1, 0},

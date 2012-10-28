@@ -11,16 +11,9 @@ import (
 	"unsafe"
 )
 
-const SizeOfSTLTriangle = 4*3*4 + 2
+const SizeOfTriangle = 4*3*4 + 2
 
-type STLPoint [3]float32
-
-type STLTriangle struct {
-	N STLPoint
-	V [3]STLPoint
-}
-
-func readSTLPoint(a []byte, p *STLPoint) []byte {
+func readPoint(a []byte, p *Point) []byte {
 	for i := 0; i < 3; i++ {
 		cur := uint32(a[0]) + uint32(a[1])<<8 + uint32(a[2])<<16 + uint32(a[3])<<24
 		p[i] = *(*float32)(unsafe.Pointer(&cur))
@@ -54,7 +47,7 @@ func consumeLine(r *bufio.Reader, want string) (err error) {
 	return nil
 }
 
-func readAsciiSTL(data []byte) (res []STLTriangle, err error) {
+func readAscii(data []byte) (res []Triangle, err error) {
 	r := bufio.NewReader(bytes.NewBuffer(data))
 	var solidName string
 	if _, solidName, err = readLineWithPrefix(r, "solid "); err != nil {
@@ -63,7 +56,7 @@ func readAsciiSTL(data []byte) (res []STLTriangle, err error) {
 	lineno := 2
 	for {
 		var prefix, str string
-		var t STLTriangle
+		var t Triangle
 		if prefix, str, err = readLineWithPrefix(r, "facet normal ", "endsolid "+solidName); err != nil {
 			if err == io.EOF {
 				return res, nil
@@ -124,7 +117,7 @@ func readAsciiSTL(data []byte) (res []STLTriangle, err error) {
 	return
 }
 
-func ReadSTL(r io.Reader) (t []STLTriangle, err error) {
+func Read(r io.Reader) (t []Triangle, err error) {
 	var data []byte
 	if data, err = ioutil.ReadAll(r); err != nil {
 		return
@@ -134,21 +127,21 @@ func ReadSTL(r io.Reader) (t []STLTriangle, err error) {
 	}
 	magic := data[:5]
 	if string(magic) == "solid" {
-		return readAsciiSTL(data)
+		return readAscii(data)
 	}
 	// Skip STL header
 	data = data[80:]
 	n := uint32(data[0]) + uint32(data[1])<<8 + uint32(data[2])<<16 + uint32(data[3])<<24
 	data = data[4:]
 
-	if len(data) < int(SizeOfSTLTriangle*n) {
-		return nil, fmt.Errorf("ReadSTL: unexpected end of file: want %d bytes to read triangle data, but only %d bytes is available", SizeOfSTLTriangle*n, len(data))
+	if len(data) < int(SizeOfTriangle*n) {
+		return nil, fmt.Errorf("Read: unexpected end of file: want %d bytes to read triangle data, but only %d bytes is available", SizeOfTriangle*n, len(data))
 	}
 	for i := 0; i < int(n); i++ {
-		var cur STLTriangle
-		data = readSTLPoint(data, &cur.N)
+		var cur Triangle
+		data = readPoint(data, &cur.N)
 		for j := 0; j < 3; j++ {
-			data = readSTLPoint(data, &cur.V[j])
+			data = readPoint(data, &cur.V[j])
 		}
 		data = data[2:]
 		t = append(t, cur)

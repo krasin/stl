@@ -8,22 +8,22 @@ import (
 
 const eps = 1E-4
 
-type readSTLTest struct {
+type readTest struct {
 	filename string
 	count    int
-	t        []STLTriangle
+	t        []Triangle
 }
 
-var readSTLTests = []readSTLTest{
+var readTests = []readTest{
 	{"data/cylinder.bin.stl", 326, nil},
 	{"data/plus_on_pedestal.stl", 1180, nil},
 	{
 		"data/cylinder.stl",
 		326,
-		[]STLTriangle{
+		[]Triangle{
 			{
 				[3]float32{0, 0, 0},
-				[3]STLPoint{
+				[3]Point{
 					{-7.708244e-01, -3.846672e+00, 5.378669e+00},
 					{-1.548386e+00, -3.683723e+00, 4.516774e+00},
 					{-1.530743e+00, -3.695526e+00, 4.194193e+00},
@@ -33,45 +33,45 @@ var readSTLTests = []readSTLTest{
 	},
 }
 
-func STLCoordEqual(a, b float32) bool {
+func CoordEqual(a, b float32) bool {
 	if math.IsNaN(float64(a)) || math.IsNaN(float64(b)) {
 		return false
 	}
 	return math.Abs(float64(a)-float64(b)) < eps
 }
 
-func STLPointEqual(p1, p2 [3]float32) bool {
+func PointEqual(p1, p2 [3]float32) bool {
 	for i := 0; i < 3; i++ {
-		if !STLCoordEqual(p1[i], p2[i]) {
+		if !CoordEqual(p1[i], p2[i]) {
 			return false
 		}
 	}
 	return true
 }
 
-func STLEqual(t1, t2 STLTriangle) bool {
-	return STLPointEqual(t1.N, t2.N) &&
-		STLPointEqual(t1.V[0], t2.V[0]) &&
-		STLPointEqual(t1.V[1], t2.V[1]) &&
-		STLPointEqual(t1.V[2], t2.V[2])
+func Equal(t1, t2 Triangle) bool {
+	return PointEqual(t1.N, t2.N) &&
+		PointEqual(t1.V[0], t2.V[0]) &&
+		PointEqual(t1.V[1], t2.V[1]) &&
+		PointEqual(t1.V[2], t2.V[2])
 }
 
-func TestReadSTL(t *testing.T) {
-	for _, test := range readSTLTests {
+func TestRead(t *testing.T) {
+	for _, test := range readTests {
 		f, err := os.Open(test.filename)
 		if err != nil {
 			t.Fatalf("os.Open(\"%v\"): %v", test.filename, err)
 		}
 		defer f.Close()
-		stl, err := ReadSTL(f)
+		stl, err := Read(f)
 		if err != nil {
-			t.Fatalf("ReadSTL: %v", err)
+			t.Fatalf("Read: %v", err)
 		}
 		if len(stl) != test.count {
 			t.Fatalf("Wrong number of triangles. Expected: %d, got: %d", test.count, len(stl))
 		}
 		for i, tr := range test.t {
-			if !STLEqual(tr, stl[i]) {
+			if !Equal(tr, stl[i]) {
 				t.Fatalf("Triangle #%d, want: %v, got: %v", i, tr, stl[i])
 			}
 		}
