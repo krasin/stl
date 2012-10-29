@@ -1,4 +1,4 @@
-[![](http://goci.me/project/image/github.com/krasin/stl)](http://goci.me/project/github.com/krasin/stl)
+[![](https://goci.herokuapp.com/project/image/github.com/krasin/stl)](http://goci.me/project/github.com/krasin/stl)
 
 This is a simple and not yet stable Go library to work with STL files.
 
