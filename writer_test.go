@@ -2,7 +2,10 @@ package stl
 
 import (
 	"bytes"
+	"io"
 	"io/ioutil"
+	"math"
+	"os"
 	"testing"
 )
 
@@ -34,7 +37,7 @@ func TestWriter(t *testing.T) {
 		if err != nil {
 			t.Errorf("Could not read test file %s: %v", tt.model, err)
 		}
-		if err = Write(buf, tt.t); err != nil {
+		if err = WriteASCII(buf, tt.t); err != nil {
 			t.Errorf("Test %s: %v", tt.model, err)
 		}
 		if !bytes.Equal(buf.Bytes(), want) {
@@ -42,4 +45,67 @@ func TestWriter(t *testing.T) {
 		}
 
 	}
+}
+
+func almostEq(v1, v2 float32) bool {
+	return math.Abs(float64(v1-v2)) < 1E-6
+}
+
+func pointEq(p1, p2 Point) bool {
+	return almostEq(p1[0], p2[0]) && almostEq(p1[1], p2[1]) && almostEq(p1[2], p2[2])
+}
+
+func equal(t1, t2 Triangle) bool {
+	return pointEq(t1.N, t2.N) && pointEq(t1.V[0], t2.V[0]) &&
+		pointEq(t1.V[1], t2.V[1]) && pointEq(t1.V[2], t2.V[2])
+}
+
+func testWriter(t *testing.T, name string, write func(io.Writer, []Triangle) error) {
+	tests := []string{
+		"data/cylinder.bin.stl",
+		"data/cylinder.stl",
+		"data/one_triangle.stl",
+		"data/plus_on_pedestal.stl",
+	}
+	for _, tt := range tests {
+		f, err := os.Open(tt)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+		defer f.Close()
+		tr, err := Read(f)
+		if err != nil {
+			t.Errorf("Read(%q): %v", tt, err)
+			continue
+		}
+		var buf bytes.Buffer
+		if err = write(&buf, tr); err != nil {
+			t.Errorf("WriteBinary(%q): %v", tt, err)
+			continue
+		}
+		tr2, err := Read(&buf)
+		if err != nil {
+			t.Errorf("%q: Read from saved failed: %v", tt, err)
+			continue
+		}
+		if len(tr) != len(tr2) {
+			t.Errorf("%q: %d = len(tr) != len(tr2) = %d", tt, len(tr), len(tr2))
+			continue
+		}
+		for i := range tr {
+			if !equal(tr[i], tr2[i]) {
+				t.Errorf("%q, i=%d, triangles are different. Was: %+v, became: %+v", tt, i, tr[i], tr2[i])
+				continue
+			}
+		}
+	}
+}
+
+func TestWriteBinary(t *testing.T) {
+	testWriter(t, "binary", WriteBinary)
+}
+
+func TestWriteASCII(t *testing.T) {
+	testWriter(t, "ascii", WriteASCII)
 }
