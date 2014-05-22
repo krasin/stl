@@ -1,8 +1,8 @@
-[![](https://goci.herokuapp.com/project/image/github.com/krasin/stl)](http://goci.me/project/github.com/krasin/stl)
+[![Build Status](https://travis-ci.org/krasin/stl.svg?branch=master)](https://travis-ci.org/krasin/stl)
 
 This is a simple and not yet stable Go library to work with STL files.
 
-It's capable to read binary and ascii STL files, as well as to write ascii STL files.
+It's capable to read/write binary and ascii STL files.
 
 Patches are welcome.
 
