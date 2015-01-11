@@ -49,7 +49,7 @@ func consumeLine(r *bufio.Reader, want string) (err error) {
 
 func readASCII(data []byte) (res []Triangle, err error) {
 	r := bufio.NewReader(bytes.NewBuffer(data))
-	if _, _, err = readLineWithPrefix(r, "solid "); err != nil {
+	if _, _, err = readLineWithPrefix(r, "solid"); err != nil {
 		return nil, err
 	}
 	lineno := 2

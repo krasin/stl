@@ -20,6 +20,7 @@ var readTests = []readTest{
 	{"data/reg_test_1.stl", 1, nil},
 	{"data/reg_test_2.stl", 326, nil},
 	{"data/reg_test_3.stl", 1, nil},
+	{"data/reg_test_4_empty_solid_name.stl", 1, nil},
 	{
 		"data/cylinder.stl",
 		326,
