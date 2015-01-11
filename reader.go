@@ -47,7 +47,7 @@ func consumeLine(r *bufio.Reader, want string) (err error) {
 	return nil
 }
 
-func readAscii(data []byte) (res []Triangle, err error) {
+func readASCII(data []byte) (res []Triangle, err error) {
 	r := bufio.NewReader(bytes.NewBuffer(data))
 	if _, _, err = readLineWithPrefix(r, "solid "); err != nil {
 		return nil, err
@@ -116,18 +116,35 @@ func readAscii(data []byte) (res []Triangle, err error) {
 	return
 }
 
+// isASCII detects if the data represents an ASCII STL file (as opposed to binary STL file).
+func isASCII(data []byte) bool {
+	if len(data) < 5 {
+		return false
+	}
+	magic := string(data[:5])
+	if magic != "solid" {
+		return false
+	}
+	for _, v := range data {
+		if v < 32 && v != '\n' && v != '\r' {
+			// non-printable chars are a good indicator of a binary STL.
+			return false
+		}
+	}
+	return true
+}
+
 // Read reads STL file from the reader.
 func Read(r io.Reader) (t []Triangle, err error) {
 	var data []byte
 	if data, err = ioutil.ReadAll(r); err != nil {
 		return
 	}
-	if len(data) < 5 {
-		return nil, fmt.Errorf("The file is too short: %d bytes", len(data))
+	if isASCII(data) {
+		return readASCII(data)
 	}
-	magic := data[:5]
-	if string(magic) == "solid" {
-		return readAscii(data)
+	if len(data) < 84 {
+		return nil, fmt.Errorf("The file is too short: %d bytes", len(data))
 	}
 	// Skip STL header
 	data = data[80:]
