@@ -27,7 +27,14 @@ func readLineWithPrefix(r *bufio.Reader, prefixes ...string) (prefix, str string
 	if line, _, err = r.ReadLine(); err != nil {
 		return
 	}
-	str = strings.TrimSpace(string(line))
+	str = string(line)
+	str = strings.Replace(str, "\t", " ", -1)
+	str = strings.Replace(str, "        ", " ", -1)
+	str = strings.Replace(str, "    ", " ", -1)
+	str = strings.Replace(str, "    ", " ", -1)
+	str = strings.Replace(str, "  ", " ", -1)
+	str = strings.Replace(str, "  ", " ", -1)
+	str = strings.TrimSpace(str)
 	for _, pp := range prefixes {
 		if strings.HasPrefix(str, pp) {
 			return pp, str[len(pp):], nil
