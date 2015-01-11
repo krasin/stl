@@ -17,6 +17,7 @@ type readTest struct {
 var readTests = []readTest{
 	{"data/cylinder.bin.stl", 326, nil},
 	{"data/plus_on_pedestal.stl", 1180, nil},
+	{"data/reg_test_1.stl", 1, nil},
 	{
 		"data/cylinder.stl",
 		326,

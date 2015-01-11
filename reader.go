@@ -49,15 +49,14 @@ func consumeLine(r *bufio.Reader, want string) (err error) {
 
 func readAscii(data []byte) (res []Triangle, err error) {
 	r := bufio.NewReader(bytes.NewBuffer(data))
-	var solidName string
-	if _, solidName, err = readLineWithPrefix(r, "solid "); err != nil {
+	if _, _, err = readLineWithPrefix(r, "solid "); err != nil {
 		return nil, err
 	}
 	lineno := 2
 	for {
 		var prefix, str string
 		var t Triangle
-		if prefix, str, err = readLineWithPrefix(r, "facet normal ", "endsolid "+solidName); err != nil {
+		if prefix, str, err = readLineWithPrefix(r, "facet normal ", "endsolid"); err != nil {
 			if err == io.EOF {
 				return res, nil
 			}
@@ -65,7 +64,7 @@ func readAscii(data []byte) (res []Triangle, err error) {
 		}
 		lineno++
 
-		if prefix == "endsolid "+solidName {
+		if prefix == "endsolid" {
 			return
 		}
 		fields := strings.Fields(str)
