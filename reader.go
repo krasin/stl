@@ -40,7 +40,7 @@ func readLineWithPrefix(r *bufio.Reader, prefixes ...string) (prefix, str string
 			return pp, str[len(pp):], nil
 		}
 	}
-	return "", "", fmt.Errorf("Line expected to start with one of the prefixes: %v, the actual line is: '%s'", prefixes, str)
+	return "", "", fmt.Errorf("line expected to start with one of the prefixes: %v, the actual line is: '%s'", prefixes, str)
 }
 
 func consumeLine(r *bufio.Reader, want string) (err error) {
@@ -49,7 +49,7 @@ func consumeLine(r *bufio.Reader, want string) (err error) {
 		return
 	}
 	if str != "" {
-		return fmt.Errorf("Line contains unexpected symbols after the right prefix: '%s', symbols: '%s'", want, str)
+		return fmt.Errorf("line contains unexpected symbols after the right prefix: '%s', symbols: '%s'", want, str)
 	}
 	return nil
 }
@@ -67,7 +67,7 @@ func readASCII(data []byte) (res []Triangle, err error) {
 			if err == io.EOF {
 				return res, nil
 			}
-			return nil, err
+			return nil, fmt.Errorf("[line=%d] %v", lineno, err)
 		}
 		lineno++
 
