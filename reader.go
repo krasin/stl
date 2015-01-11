@@ -126,7 +126,7 @@ func isASCII(data []byte) bool {
 		return false
 	}
 	for _, v := range data {
-		if v < 32 && v != '\n' && v != '\r' {
+		if v < 32 && v != '\n' && v != '\r' && v != '\t' {
 			// non-printable chars are a good indicator of a binary STL.
 			return false
 		}
