@@ -125,11 +125,11 @@ func readASCII(data []byte) (res []Triangle, err error) {
 
 // isASCII detects if the data represents an ASCII STL file (as opposed to binary STL file).
 func isASCII(data []byte) bool {
-	if len(data) < 5 {
+	if len(data) < 14 {
 		return false
 	}
-	magic := string(data[:5])
-	if magic != "solid" {
+	magic := strings.TrimSpace(string(data[:14]))
+	if !strings.HasPrefix(magic, "solid") {
 		return false
 	}
 	for _, v := range data {
