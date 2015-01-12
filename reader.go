@@ -112,7 +112,7 @@ func readASCII(data []byte) (res []Triangle, err error) {
 		}
 		lineno++
 
-		if err = consumeLine(r, "endfacet"); err != nil {
+		if _, _, err = readLineWithPrefix(r, "endfacet"); err != nil {
 			return nil, err
 		}
 		lineno++

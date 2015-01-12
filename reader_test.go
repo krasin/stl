@@ -23,6 +23,7 @@ var readTests = []readTest{
 	{"data/reg_test_4_empty_solid_name.stl", 1, nil},
 	{"data/reg_test_5_tab_after_normal.stl", 1, nil},
 	{"data/reg_test_6_space_before_solid.stl", 1, nil},
+	{"data/reg_test_7_endfacet_junk.stl", 1, nil},
 	{
 		"data/cylinder.stl",
 		326,
