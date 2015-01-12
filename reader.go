@@ -54,6 +54,21 @@ func consumeLine(r *bufio.Reader, want string) (err error) {
 	return nil
 }
 
+func parseFloat32(str string) (float32, error) {
+	v, err := strconv.ParseFloat(str, 32)
+	if err != nil {
+		// Give it a second chance. A very small amount of STL files use a comma as a delimiter
+		tmp := strings.Replace(str, ",", ".", 1)
+		var err2 error
+		if v, err2 = strconv.ParseFloat(tmp, 32); err2 != nil {
+			// Return the first error, in order to show the original value.
+			return 0, err
+		}
+		// It has parsed the thing. OK
+	}
+	return float32(v), nil
+}
+
 func readASCII(data []byte) (res []Triangle, err error) {
 	r := bufio.NewReader(bytes.NewBuffer(data))
 	if _, _, err = readLineWithPrefix(r, "solid"); err != nil {
@@ -79,11 +94,9 @@ func readASCII(data []byte) (res []Triangle, err error) {
 			return nil, fmt.Errorf("[line=%d] Normal definition is broken: '%s'", lineno, str)
 		}
 		for i := 0; i < 3; i++ {
-			var v float64
-			if v, err = strconv.ParseFloat(fields[i], 32); err != nil {
+			if t.N[i], err = parseFloat32(fields[i]); err != nil {
 				return nil, err
 			}
-			t.N[i] = float32(v)
 		}
 		if err = consumeLine(r, "outer loop"); err != nil {
 			return nil, err
@@ -100,11 +113,9 @@ func readASCII(data []byte) (res []Triangle, err error) {
 				return nil, fmt.Errorf("[line=%d] Vertex definition is broken: '%s'", lineno, str)
 			}
 			for j := 0; j < 3; j++ {
-				var v float64
-				if v, err = strconv.ParseFloat(fields[j], 32); err != nil {
+				if t.V[i][j], err = parseFloat32(fields[j]); err != nil {
 					return nil, err
 				}
-				t.V[i][j] = float32(v)
 			}
 		}
 		if err = consumeLine(r, "endloop"); err != nil {
