@@ -22,19 +22,34 @@ func readPoint(a []byte, p *Point) []byte {
 	return a
 }
 
-func readLineWithPrefix(r *bufio.Reader, prefixes ...string) (prefix, str string, err error) {
-	var line []byte
-	if line, _, err = r.ReadLine(); err != nil {
-		return
+// scanLine reads a non-empty line from scanner. It cleans it from tabs and eliminates double spaces.
+func scanLine(sc *bufio.Scanner) (str string, err error) {
+	for {
+		if !sc.Scan() {
+			if err = sc.Err(); err == nil {
+				err = io.EOF
+			}
+			return "", err
+		}
+		str = sc.Text()
+		str = strings.Replace(str, "\t", " ", -1)
+		str = strings.Replace(str, "        ", " ", -1)
+		str = strings.Replace(str, "    ", " ", -1)
+		str = strings.Replace(str, "    ", " ", -1)
+		str = strings.Replace(str, "  ", " ", -1)
+		str = strings.Replace(str, "  ", " ", -1)
+		str = strings.TrimSpace(str)
+		if str != "" {
+			return str, nil
+		}
 	}
-	str = string(line)
-	str = strings.Replace(str, "\t", " ", -1)
-	str = strings.Replace(str, "        ", " ", -1)
-	str = strings.Replace(str, "    ", " ", -1)
-	str = strings.Replace(str, "    ", " ", -1)
-	str = strings.Replace(str, "  ", " ", -1)
-	str = strings.Replace(str, "  ", " ", -1)
-	str = strings.TrimSpace(str)
+}
+
+func readLineWithPrefix(sc *bufio.Scanner, prefixes ...string) (prefix, str string, err error) {
+	str, err = scanLine(sc)
+	if err != nil {
+		return "", "", err
+	}
 	for _, pp := range prefixes {
 		if strings.HasPrefix(str, pp) {
 			return pp, str[len(pp):], nil
@@ -43,9 +58,9 @@ func readLineWithPrefix(r *bufio.Reader, prefixes ...string) (prefix, str string
 	return "", "", fmt.Errorf("line expected to start with one of the prefixes: %v, the actual line is: '%s'", prefixes, str)
 }
 
-func consumeLine(r *bufio.Reader, want string) (err error) {
+func consumeLine(sc *bufio.Scanner, want string) (err error) {
 	var str string
-	if _, str, err = readLineWithPrefix(r, want); err != nil {
+	if _, str, err = readLineWithPrefix(sc, want); err != nil {
 		return
 	}
 	if str != "" {
@@ -69,16 +84,35 @@ func parseFloat32(str string) (float32, error) {
 	return float32(v), nil
 }
 
+// scanLines will return lines delimited by CR or LF.
+// It might report empty lines, they will be filtered later.
+func scanLines(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	if atEOF && len(data) == 0 {
+		return 0, nil, nil
+	}
+	for i, v := range data {
+		if v == '\n' || v == '\r' {
+			return i + 1, data[:i], nil
+		}
+	}
+	if atEOF {
+		return len(data), data, nil
+	}
+	// line is not ended, need more data
+	return 0, nil, nil
+}
+
 func readASCII(data []byte) (res []Triangle, err error) {
-	r := bufio.NewReader(bytes.NewBuffer(data))
-	if _, _, err = readLineWithPrefix(r, "solid"); err != nil {
+	sc := bufio.NewScanner(bytes.NewReader(data))
+	sc.Split(scanLines)
+	if _, _, err = readLineWithPrefix(sc, "solid"); err != nil {
 		return nil, err
 	}
 	lineno := 2
 	for {
 		var prefix, str string
 		var t Triangle
-		if prefix, str, err = readLineWithPrefix(r, "facet normal ", "endsolid"); err != nil {
+		if prefix, str, err = readLineWithPrefix(sc, "facet normal ", "endsolid"); err != nil {
 			if err == io.EOF {
 				return res, nil
 			}
@@ -98,12 +132,12 @@ func readASCII(data []byte) (res []Triangle, err error) {
 				return nil, err
 			}
 		}
-		if err = consumeLine(r, "outer loop"); err != nil {
+		if err = consumeLine(sc, "outer loop"); err != nil {
 			return nil, err
 		}
 		lineno++
 		for i := 0; i < 3; i++ {
-			if _, str, err = readLineWithPrefix(r, "vertex "); err != nil {
+			if _, str, err = readLineWithPrefix(sc, "vertex "); err != nil {
 				return nil, err
 			}
 			lineno++
@@ -118,12 +152,12 @@ func readASCII(data []byte) (res []Triangle, err error) {
 				}
 			}
 		}
-		if err = consumeLine(r, "endloop"); err != nil {
+		if err = consumeLine(sc, "endloop"); err != nil {
 			return nil, err
 		}
 		lineno++
 
-		if _, _, err = readLineWithPrefix(r, "endfacet"); err != nil {
+		if _, _, err = readLineWithPrefix(sc, "endfacet"); err != nil {
 			return nil, err
 		}
 		lineno++

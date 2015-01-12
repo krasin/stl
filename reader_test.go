@@ -32,6 +32,8 @@ var readTests = []readTest{
 		filename: "data/reg_test_10_bin_overflow.stl",
 		err:      errors.New("Read: unexpected end of file: want 4294979500 bytes to read triangle data, but only 16300 bytes is available"),
 	},
+	{"data/reg_test_11_mac_cr.stl", 1, nil, nil},
+	{"data/reg_test_12_empty_lines.stl", 1, nil, nil},
 	{
 		"data/cylinder.stl",
 		326,
@@ -88,11 +90,13 @@ func TestRead(t *testing.T) {
 			continue
 		}
 		if len(stl) != tt.count {
-			t.Fatalf("Wrong number of triangles. Expected: %d, got: %d", tt.count, len(stl))
+			t.Errorf("stl.Read(%q): wrong number of triangles. Expected: %d, got: %d", tt.filename, tt.count, len(stl))
+			continue
 		}
 		for i, tr := range tt.t {
 			if !Equal(tr, stl[i]) {
-				t.Fatalf("Triangle #%d, want: %v, got: %v", i, tr, stl[i])
+				t.Errorf("stl.Read(%q): triangle #%d, want: %v, got: %v", tt.filename, i, tr, stl[i])
+				break
 			}
 		}
 	}
