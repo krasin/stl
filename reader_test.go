@@ -1,6 +1,8 @@
 package stl
 
 import (
+	"errors"
+	"fmt"
 	"math"
 	"os"
 	"testing"
@@ -12,18 +14,20 @@ type readTest struct {
 	filename string
 	count    int
 	t        []Triangle
+	err      error
 }
 
 var readTests = []readTest{
-	{"data/cylinder.bin.stl", 326, nil},
-	{"data/plus_on_pedestal.stl", 1180, nil},
-	{"data/reg_test_1.stl", 1, nil},
-	{"data/reg_test_2.stl", 326, nil},
-	{"data/reg_test_3.stl", 1, nil},
-	{"data/reg_test_4_empty_solid_name.stl", 1, nil},
-	{"data/reg_test_5_tab_after_normal.stl", 1, nil},
-	{"data/reg_test_6_space_before_solid.stl", 1, nil},
-	{"data/reg_test_7_endfacet_junk.stl", 1, nil},
+	{"data/cylinder.bin.stl", 326, nil, nil},
+	{"data/plus_on_pedestal.stl", 1180, nil, nil},
+	{"data/reg_test_1.stl", 1, nil, nil},
+	{"data/reg_test_2.stl", 326, nil, nil},
+	{"data/reg_test_3.stl", 1, nil, nil},
+	{"data/reg_test_4_empty_solid_name.stl", 1, nil, nil},
+	{"data/reg_test_5_tab_after_normal.stl", 1, nil, nil},
+	{"data/reg_test_6_space_before_solid.stl", 1, nil, nil},
+	{"data/reg_test_7_endfacet_junk.stl", 1, nil, nil},
+	{"data/reg_test_10_bin_overflow.stl", 0, nil, errors.New("lala")},
 	{
 		"data/cylinder.stl",
 		326,
@@ -37,6 +41,7 @@ var readTests = []readTest{
 				},
 			},
 		},
+		nil,
 	},
 }
 
@@ -64,20 +69,24 @@ func Equal(t1, t2 Triangle) bool {
 }
 
 func TestRead(t *testing.T) {
-	for _, test := range readTests {
-		f, err := os.Open(test.filename)
+	for _, tt := range readTests {
+		f, err := os.Open(tt.filename)
 		if err != nil {
-			t.Fatalf("os.Open(\"%v\"): %v", test.filename, err)
+			t.Fatalf("os.Open(\"%v\"): %v", tt.filename, err)
 		}
 		defer f.Close()
 		stl, err := Read(f)
+		if fmt.Sprintf("%v", err) != fmt.Sprintf("%v", tt.err) {
+			t.Errorf("stl.Read(%q): %v\nwant err: %v", tt.filename, err, tt.err)
+			continue
+		}
 		if err != nil {
-			t.Fatalf("Read: %v", err)
+			continue
 		}
-		if len(stl) != test.count {
-			t.Fatalf("Wrong number of triangles. Expected: %d, got: %d", test.count, len(stl))
+		if len(stl) != tt.count {
+			t.Fatalf("Wrong number of triangles. Expected: %d, got: %d", tt.count, len(stl))
 		}
-		for i, tr := range test.t {
+		for i, tr := range tt.t {
 			if !Equal(tr, stl[i]) {
 				t.Fatalf("Triangle #%d, want: %v, got: %v", i, tr, stl[i])
 			}
