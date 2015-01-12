@@ -158,7 +158,6 @@ func Read(r io.Reader) (t []Triangle, err error) {
 	n := uint32(data[0]) + uint32(data[1])<<8 + uint32(data[2])<<16 + uint32(data[3])<<24
 	data = data[4:]
 
-	fmt.Printf("len(data): %d, n: %d, SizeOfTriangle*n: %d\n", len(data), n, SizeOfTriangle*int64(n))
 	if int64(len(data)) < SizeOfTriangle*int64(n) {
 		return nil, fmt.Errorf("Read: unexpected end of file: want %d bytes to read triangle data, but only %d bytes is available", SizeOfTriangle*int64(n), len(data))
 	}

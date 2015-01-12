@@ -27,7 +27,10 @@ var readTests = []readTest{
 	{"data/reg_test_5_tab_after_normal.stl", 1, nil, nil},
 	{"data/reg_test_6_space_before_solid.stl", 1, nil, nil},
 	{"data/reg_test_7_endfacet_junk.stl", 1, nil, nil},
-	{"data/reg_test_10_bin_overflow.stl", 0, nil, errors.New("lala")},
+	{
+		filename: "data/reg_test_10_bin_overflow.stl",
+		err:      errors.New("Read: unexpected end of file: want 4294979500 bytes to read triangle data, but only 16300 bytes is available"),
+	},
 	{
 		"data/cylinder.stl",
 		326,
