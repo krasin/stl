@@ -34,6 +34,20 @@ func WriteASCII(w io.Writer, t []Triangle) error {
 	return nil
 }
 
+func chunk(a []Triangle, s int) (b [][]Triangle) {
+	l := len(a) / s
+	b = make([][]Triangle, l)
+	for i := range b {
+		b[i] = a[i*s : (i+1)*s]
+	}
+	r := len(a) - l*s
+	if r != 0 {
+		rem := a[l*s : l*s+r]
+		b = append(b, rem)
+	}
+	return b
+}
+
 // Write writes the triangle mesh to the writer using binary STL codec.
 func WriteBinary(w io.Writer, t []Triangle) error {
 	headerBuf := make([]byte, 84)
@@ -45,9 +59,12 @@ func WriteBinary(w io.Writer, t []Triangle) error {
 		return errHeader
 	}
 
-	// Write each triangle
-	for _, t := range t {
-		tErr := writeTriangleBinary(w, &t)
+	//chunk triangles for better write speeds
+	chunks := chunk(t, 512)
+
+	// Write each chunk
+	for _, c := range chunks {
+		tErr := writeTrianglesBinary(w, c)
 		if tErr != nil {
 			return tErr
 		}
@@ -56,14 +73,16 @@ func WriteBinary(w io.Writer, t []Triangle) error {
 	return nil
 }
 
-func writeTriangleBinary(w io.Writer, t *Triangle) error {
-	buf := make([]byte, 50)
+func writeTrianglesBinary(w io.Writer, t []Triangle) error {
+	buf := make([]byte, 50*len(t))
 	offset := 0
-	encodePoint(buf, &offset, &t.N)
-	encodePoint(buf, &offset, &t.V[0])
-	encodePoint(buf, &offset, &t.V[1])
-	encodePoint(buf, &offset, &t.V[2])
-	encodeUint16(buf, &offset, 0)
+	for _, t := range t {
+		encodePoint(buf, &offset, &t.N)
+		encodePoint(buf, &offset, &t.V[0])
+		encodePoint(buf, &offset, &t.V[1])
+		encodePoint(buf, &offset, &t.V[2])
+		encodeUint16(buf, &offset, 0)
+	}
 	_, err := w.Write(buf)
 	return err
 }
