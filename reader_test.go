@@ -39,7 +39,7 @@ var readTests = []readTest{
 		326,
 		[]Triangle{
 			{
-				[3]float32{0, 0, 0},
+				[3]float64{0, 0, 0},
 				[3]Point{
 					{-7.708244e-01, -3.846672e+00, 5.378669e+00},
 					{-1.548386e+00, -3.683723e+00, 4.516774e+00},
@@ -51,14 +51,14 @@ var readTests = []readTest{
 	},
 }
 
-func CoordEqual(a, b float32) bool {
-	if math.IsNaN(float64(a)) || math.IsNaN(float64(b)) {
+func CoordEqual(a, b float64) bool {
+	if math.IsNaN(a) || math.IsNaN(b) {
 		return false
 	}
-	return math.Abs(float64(a)-float64(b)) < eps
+	return math.Abs(a-b) < eps
 }
 
-func PointEqual(p1, p2 [3]float32) bool {
+func PointEqual(p1, p2 [3]float64) bool {
 	for i := 0; i < 3; i++ {
 		if !CoordEqual(p1[i], p2[i]) {
 			return false

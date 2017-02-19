@@ -60,9 +60,9 @@ func WriteBinary(w io.Writer, t []Triangle) error {
 		if err != nil {
 			return
 		}
-		f32w(p[0])
-		f32w(p[1])
-		f32w(p[2])
+		f32w(float32(p[0]))
+		f32w(float32(p[1]))
+		f32w(float32(p[2]))
 	}
 
 	// Write 80 bytes zero header, which is always ignored

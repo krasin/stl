@@ -13,7 +13,7 @@ import (
 
 const SizeOfTriangle = 4*3*4 + 2
 
-func readPoint(a []byte, p *Point) []byte {
+func readPoint32(a []byte, p *point32) []byte {
 	for i := 0; i < 3; i++ {
 		cur := uint32(a[0]) + uint32(a[1])<<8 + uint32(a[2])<<16 + uint32(a[3])<<24
 		p[i] = *(*float32)(unsafe.Pointer(&cur))
@@ -69,7 +69,7 @@ func consumeLine(sc *bufio.Scanner, want string) (err error) {
 	return nil
 }
 
-func parseFloat32(str string) (float32, error) {
+func parseFloat32(str string) (float64, error) {
 	v, err := strconv.ParseFloat(str, 32)
 	if err != nil {
 		// Give it a second chance. A very small amount of STL files use a comma as a delimiter
@@ -81,7 +81,7 @@ func parseFloat32(str string) (float32, error) {
 		}
 		// It has parsed the thing. OK
 	}
-	return float32(v), nil
+	return v, nil
 }
 
 // scanLines will return lines delimited by CR or LF.
@@ -207,13 +207,13 @@ func Read(r io.Reader) (t []Triangle, err error) {
 		return nil, fmt.Errorf("Read: unexpected end of file: want %d bytes to read triangle data, but only %d bytes is available", SizeOfTriangle*int64(n), len(data))
 	}
 	for i := 0; i < int(n); i++ {
-		var cur Triangle
-		data = readPoint(data, &cur.N)
+		var cur triangle32
+		data = readPoint32(data, &cur.n)
 		for j := 0; j < 3; j++ {
-			data = readPoint(data, &cur.V[j])
+			data = readPoint32(data, &cur.v[j])
 		}
 		data = data[2:]
-		t = append(t, cur)
+		t = append(t, triangle32ToTriangle(&cur))
 	}
 	return
 }

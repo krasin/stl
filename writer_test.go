@@ -47,8 +47,8 @@ func TestWriter(t *testing.T) {
 	}
 }
 
-func almostEq(v1, v2 float32) bool {
-	return math.Abs(float64(v1-v2)) < 1E-6
+func almostEq(v1, v2 float64) bool {
+	return math.Abs(v1-v2) < 1E-6
 }
 
 func pointEq(p1, p2 Point) bool {

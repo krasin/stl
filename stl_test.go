@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func near(a, b float32) bool {
+func near(a, b float64) bool {
 	return math.Abs(float64(a-b)) < eps
 }
 
