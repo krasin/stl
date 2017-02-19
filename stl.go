@@ -1,9 +1,7 @@
 package stl
 
 import (
-	"fmt"
 	"math"
-	"os"
 )
 
 // Point represent a point or vector in 3-dimensional space.
@@ -47,9 +45,6 @@ func BoundingBox(t []Triangle) (min, max Point) {
 				}
 				if max[j] < tr.V[i][j] {
 					max[j] = tr.V[i][j]
-					if j == 2 {
-						fmt.Fprintf(os.Stderr, "Max point: %+v\n", tr.V[i])
-					}
 				}
 			}
 		}
