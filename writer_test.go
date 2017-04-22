@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"math"
+	"math/rand"
 	"os"
 	"testing"
 )
@@ -108,4 +109,35 @@ func TestWriteBinary(t *testing.T) {
 
 func TestWriteASCII(t *testing.T) {
 	testWriter(t, "ascii", WriteASCII)
+}
+
+func randPoint() Point {
+	return Point{rand.Float64(), rand.Float64(), rand.Float64()}
+}
+
+func randTriangle() Triangle {
+	return Triangle{
+		N: randPoint(),
+		V: [3]Point{randPoint(), randPoint(), randPoint()},
+	}
+}
+
+func generateSTL(n int) []Triangle {
+	var res = make([]Triangle, n)
+	for i := 0; i < n; i++ {
+		res[i] = randTriangle()
+	}
+	return res
+}
+
+var randomSTL = generateSTL(1E6)
+
+func BenchmarkWriteBinary(b *testing.B) {
+	var buf bytes.Buffer
+	for n := 0; n < b.N; n++ {
+		buf.Reset()
+		if err := WriteBinary(&buf, randomSTL); err != nil {
+			b.Fatalf("unexpected error writing a random STL: %v", err)
+		}
+	}
 }
