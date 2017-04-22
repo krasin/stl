@@ -37,7 +37,6 @@ func WriteASCII(w io.Writer, t []Triangle) error {
 // Write writes the triangle mesh to the writer using binary STL codec.
 func WriteBinary(w io.Writer, t []Triangle) error {
 	var err error
-	twoZeroes := make([]byte, 2)
 	wr := func(data []byte) {
 		if err != nil {
 			return
@@ -50,19 +49,13 @@ func WriteBinary(w io.Writer, t []Triangle) error {
 		}
 		err = binary.Write(w, binary.LittleEndian, v)
 	}
-	f32w := func(f float32) {
-		if err != nil {
-			return
-		}
-		err = binary.Write(w, binary.LittleEndian, math.Float32bits(f))
+	f32 := func(dst []byte, f float32) {
+		binary.LittleEndian.PutUint32(dst, math.Float32bits(f))
 	}
-	pwr := func(p Point) {
-		if err != nil {
-			return
-		}
-		f32w(float32(p[0]))
-		f32w(float32(p[1]))
-		f32w(float32(p[2]))
+	p := func(dst []byte, p Point) {
+		f32(dst[0:4], float32(p[0]))
+		f32(dst[4:8], float32(p[1]))
+		f32(dst[8:12], float32(p[2]))
 	}
 
 	// Write 80 bytes zero header, which is always ignored
@@ -72,14 +65,15 @@ func WriteBinary(w io.Writer, t []Triangle) error {
 	bwr(uint32(len(t)))
 
 	for _, tr := range t {
+		var cur [4*3*4 + 2]byte
 		if err != nil {
 			return err
 		}
-		pwr(tr.N)
-		pwr(tr.V[0])
-		pwr(tr.V[1])
-		pwr(tr.V[2])
-		wr(twoZeroes)
+		p(cur[0:12], tr.N)
+		p(cur[12:24], tr.V[0])
+		p(cur[24:36], tr.V[1])
+		p(cur[36:48], tr.V[2])
+		wr(cur[:])
 	}
 
 	return err
