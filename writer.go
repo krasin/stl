@@ -1,21 +1,25 @@
 package stl
 
 import (
+	"bufio"
 	"encoding/binary"
 	"fmt"
 	"io"
 	"math"
 )
 
+var writeBufSize = 1 << 20 // 1 MB
+
 // WriteASCII writes the triangle mesh to the writer using ASCII STL codec.
 func WriteASCII(w io.Writer, t []Triangle) error {
+	bw := bufio.NewWriterSize(w, writeBufSize)
 	var err error
 
 	printf := func(format string, a ...interface{}) {
 		if err != nil {
 			return
 		}
-		_, err = fmt.Fprintf(w, format, a...)
+		_, err = fmt.Fprintf(bw, format, a...)
 	}
 	printf("solid object\n")
 	for _, tt := range t {
@@ -31,23 +35,28 @@ func WriteASCII(w io.Writer, t []Triangle) error {
 		printf("endfacet\n")
 	}
 	printf("endsolid object\n")
-	return nil
+	if err != nil {
+		return err
+	}
+	return bw.Flush()
 }
 
 // Write writes the triangle mesh to the writer using binary STL codec.
 func WriteBinary(w io.Writer, t []Triangle) error {
 	var err error
+	bw := bufio.NewWriterSize(w, writeBufSize)
+
 	wr := func(data []byte) {
 		if err != nil {
 			return
 		}
-		_, err = w.Write(data)
+		_, err = bw.Write(data)
 	}
 	bwr := func(v interface{}) {
 		if err != nil {
 			return
 		}
-		err = binary.Write(w, binary.LittleEndian, v)
+		err = binary.Write(bw, binary.LittleEndian, v)
 	}
 	f32 := func(dst []byte, f float32) {
 		binary.LittleEndian.PutUint32(dst, math.Float32bits(f))
@@ -76,5 +85,8 @@ func WriteBinary(w io.Writer, t []Triangle) error {
 		wr(cur[:])
 	}
 
-	return err
+	if err != nil {
+		return err
+	}
+	return bw.Flush()
 }

@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"os"
 	"testing"
+	"time"
 )
 
 type writerTest struct {
@@ -130,13 +131,22 @@ func generateSTL(n int) []Triangle {
 	return res
 }
 
+type delayWriter struct {
+	w io.Writer
+}
+
+func (dw *delayWriter) Write(b []byte) (n int, err error) {
+	time.Sleep(10 * time.Millisecond)
+	return dw.w.Write(b)
+}
+
 var randomSTL = generateSTL(1E6)
 
 func BenchmarkWriteBinary(b *testing.B) {
 	var buf bytes.Buffer
 	for n := 0; n < b.N; n++ {
 		buf.Reset()
-		if err := WriteBinary(&buf, randomSTL); err != nil {
+		if err := WriteBinary(&delayWriter{&buf}, randomSTL); err != nil {
 			b.Fatalf("unexpected error writing a random STL: %v", err)
 		}
 	}
